@@ -41,7 +41,7 @@ func executePlan(cmd *cobra.Command, option string) ([]string, error) {
 			if len(matches) > 0 {
 				for _, match := range matches {
 					if len(match) > 1 {
-						color.Red.Println(match[1])
+						color.Red.Println("\nWARNING: " + match[1])
 					}
 				}
 				ignoreError = true
