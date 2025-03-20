@@ -34,8 +34,23 @@ func executePlan(cmd *cobra.Command, option string) ([]string, error) {
 
 	out, err := planCmd.CombinedOutput()
 	if err != nil {
-		color.Red.Println(string(out))
-		return nil, err
+		ignoreError := false
+		if option == "-destroy" {
+			re := regexp.MustCompile(`(Resource .* has lifecycle\.prevent_destroy set)`)
+			matches := re.FindAllStringSubmatch(string(out), -1)
+			if len(matches) > 0 {
+				for _, match := range matches {
+					if len(match) > 1 {
+						color.Red.Println(match[1])
+					}
+				}
+				ignoreError = true
+			}
+		}
+		if !ignoreError {
+			color.Red.Println(string(out))
+			return nil, err
+		}
 	}
 
 	actionPattern := actionPatternMap[action]
